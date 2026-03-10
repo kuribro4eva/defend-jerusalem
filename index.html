@@ -728,100 +728,101 @@
 
   // damage: 0 = hold out (no health loss), >0 = health drops by that amount
   // Best picks (least damage):
-  //   [0] Deploy Shield Wall (0), [1] Reinforce Gate with Timber (0), [2] Launch Flaming Catapults (0),
-  //   [3] Ration Food and Water (0), [4] Drop Boulders from Above (0), [5] Set Fire to Siege Equipment (0),
-  //   [6] Fortify the Inner Wall (10), [7] Deploy Archers to High Ground (15), [8] Flood the Tunnels (20),
+  //   [0] Raise the Shields (0), [1] Brace the Gate with Timber (0), [2] Launch Fire at the Towers (0),
+  //   [3] Ration What's Left Carefully (0), [4] Pour Water into the Tunnels (0),
+  //   [5] Raid and Destroy Their Catapults (0), [6] Build Barricades and Dig Trenches (10),
+  //   [7] Post Archers on the Highest Towers (15), [8] Flood the Tunnels with Water (20),
   //   [9] all 100 (auto-kill)
   // Best case: 0+0+0+0+0+0+10+15+20 = 45 damage → reach wave 10 at 55 HP
   var waves = [
     {
-      title: "Archers on the Horizon",
-      subtitle: "A line of enemy archers advances toward the walls",
-      choices: ["Deploy Shield Wall", "Fire Back with Archers", "Pour Boiling Oil"],
+      title: "Archers Attack",
+      subtitle: "A line of enemy archers fires on your walls",
+      choices: ["Raise the Shields", "Fire Arrows Back", "Hide Inside the Buildings"],
       damage: [0, 10, 5],
       results: [
         "The shields deflect the arrows! The walls hold.",
         "Your archers trade volleys\u2026 but you lose more than they do.",
-        "The oil drives some back, but they regroup quickly."
+        "You\u2019re safe for now, but you\u2019ve given up the wall positions."
       ],
       defenseAnim: "defense-walls"
     },
     {
       title: "Battering Ram at the Gate",
       subtitle: "A massive ram pounds against the main gate",
-      choices: ["Send Cavalry Out to Flank", "Reinforce the Gate with Timber", "Shoot Arrows at the Ram Crew"],
-      damage: [10, 0, 5],
+      choices: ["Brace the Gate with Timber", "Drop Rocks on the Ram Crew", "Send Soldiers Out to Fight"],
+      damage: [0, 5, 10],
       results: [
-        "The cavalry charges out but is surrounded and cut off.",
         "The timber braces hold! The gate stands firm.",
-        "A few fall, but more soldiers take their place."
+        "Some rocks land, but the ram is heavily armored.",
+        "Your soldiers are exposed outside the walls and driven back."
       ],
       defenseAnim: "defense-supplies"
     },
     {
-      title: "Siege Towers Approach",
-      subtitle: "Towering siege engines roll toward the walls",
-      choices: ["Launch Flaming Catapults", "Dig a Trench to Block Them", "Rally Troops to the Walls"],
-      damage: [0, 10, 5],
+      title: "Siege Towers Rolling In",
+      subtitle: "Wooden siege towers approach the walls",
+      choices: ["Launch Fire at the Towers", "Rally Troops at the Walls", "Dig a Trench"],
+      damage: [0, 5, 10],
       results: [
-        "Direct hit! The siege towers burn to the ground.",
-        "The trench slows them, but they fill it with rubble and press on.",
-        "Your troops hold the wall, but take heavy casualties."
+        "Direct hit! The wooden towers burn to the ground.",
+        "Your troops hold the wall, but the towers keep coming.",
+        "The trench slows them, but they fill it with rubble and press on."
       ],
       defenseAnim: "defense-unity"
     },
     {
-      title: "Supplies Running Low",
-      subtitle: "The siege drags on and food is scarce",
-      choices: ["Ration Food and Water", "Send Scouts for Supplies", "Slaughter the Horses for Meat"],
+      title: "Food and Water Running Out",
+      subtitle: "The siege drags on and supplies are low",
+      choices: ["Ration What\u2019s Left Carefully", "Send Scouts to Find Supplies", "Try to Break Through the Siege Lines"],
       damage: [0, 10, 10],
       results: [
         "Careful rationing keeps the garrison fed. Morale holds.",
         "The scouts are captured. No supplies get through.",
-        "The meat buys time, but now you have no cavalry."
+        "The breakout fails. Most are captured or driven back."
       ],
       defenseAnim: "defense-supplies"
     },
     {
-      title: "Sappers Under the Wall",
-      subtitle: "The enemy digs tunnels beneath your foundations",
-      choices: ["Charge Out to Stop Them", "Drop Boulders from Above", "Dig Counter-Tunnels"],
-      damage: [15, 0, 10],
+      title: "Enemies Digging Under the Walls",
+      subtitle: "You hear tunneling beneath the foundations",
+      choices: ["Pour Water into the Tunnels", "Dig Tunnels to Meet Them", "Send Soldiers Outside to Stop Them"],
+      damage: [0, 10, 15],
       results: [
-        "Your soldiers are ambushed outside the walls.",
-        "The boulders collapse the tunnel entrance! Threat neutralized.",
-        "The tunnels meet underground\u2026 fierce fighting, heavy losses."
+        "Water floods the tunnels! The diggers retreat.",
+        "Your diggers meet theirs underground\u2026 heavy losses on both sides.",
+        "Your soldiers are ambushed outside the walls."
       ],
       defenseAnim: "defense-walls"
     },
     {
-      title: "Fire Assault",
-      subtitle: "Flaming projectiles rain down on the city",
-      choices: ["Set Fire to Their Siege Equipment", "Form Bucket Brigades", "Evacuate to the Inner Keep"],
+      title: "Flaming Rocks Rain Down",
+      subtitle: "Fire catapults bombard the city",
+      choices: ["Raid and Destroy Their Catapults", "Organize Teams to Fight Fires", "Retreat to the Inner Keep"],
       damage: [0, 10, 15],
       results: [
         "A daring raid destroys their catapults! The fires stop.",
-        "Buckets slow the damage, but buildings still burn.",
+        "Teams slow the damage, but buildings still burn.",
         "The outer city burns. You lose ground and supplies."
       ],
       defenseAnim: "defense-combat"
     },
     {
-      title: "Cavalry Charge",
-      subtitle: "Mounted warriors thunder toward the weakened walls",
-      choices: ["Fortify the Inner Wall", "Set Spike Traps", "Open the Gates and Charge"],
+      title: "Horsemen Charge the Walls",
+      subtitle: "Mounted warriors thunder toward you",
+      choices: ["Build Barricades and Dig Trenches", "Line Up Spearmen at the Walls", "Open the Gates and Charge Out"],
       damage: [10, 15, 20],
       results: [
-        "The inner wall slows them\u2026 but they find cracks and push through.",
-        "Some horses fall, but the riders dismount and keep fighting.",
+        "The barricades slow the charge\u2026 but they find a way around.",
+        "The spearmen hold for a time, but there aren\u2019t enough.",
         "A brave charge\u2026 but you are outnumbered five to one."
       ],
       defenseAnim: "defense-walls"
     },
     {
-      title: "Night Raid",
-      subtitle: "Under cover of darkness, elite soldiers scale the walls",
-      choices: ["Deploy Archers to High Ground", "Light Signal Fires", "Send Patrols Along the Wall"],
+      title: "Attack in the Dark",
+      subtitle: "Under cover of night, soldiers scale the walls",
+      choices: ["Post Archers on the Highest Towers", "Light Fires Along the Walls", "Send Patrols Along the Wall"],
       damage: [15, 20, 25],
       results: [
         "Your archers pick off many climbers\u2026 but some still slip through.",
@@ -831,26 +832,26 @@
       defenseAnim: "defense-unity"
     },
     {
-      title: "Tunnels Beneath the City",
-      subtitle: "The ground shakes \u2014 they\u2019re tunneling under the city itself",
-      choices: ["Collapse Buildings to Block Them", "Flood the Tunnels", "Abandon the Outer District"],
-      damage: [25, 20, 30],
+      title: "The Ground Shakes",
+      subtitle: "They\u2019re tunneling under the city itself",
+      choices: ["Flood the Tunnels with Water", "Collapse Buildings to Block Them", "Abandon the Outer District"],
+      damage: [20, 25, 30],
       results: [
-        "Buildings fall and slow them\u2026 but new tunnels open elsewhere.",
         "Water slows the diggers, but the foundations are already cracked.",
+        "Buildings fall and slow them\u2026 but new tunnels open elsewhere.",
         "You lose a third of the city. The enemy pours in."
       ],
       defenseAnim: "defense-combat"
     },
     {
       title: "The Final Assault",
-      subtitle: "Every remaining force attacks at once from all sides",
-      choices: ["Man Every Wall", "Concentrate at the Gate", "Launch a Final Sortie"],
+      subtitle: "Every remaining enemy force attacks at once",
+      choices: ["Man Every Wall", "Guard the Gate", "Charge Out to Fight"],
       damage: [100, 100, 100],
       results: [
         "You spread too thin. They break through everywhere.",
         "The gate holds, but they pour over the undefended walls.",
-        "A valiant charge\u2026 but there are too many. The city falls."
+        "A brave charge\u2026 but there are too many. The city falls."
       ],
       defenseAnim: "defense-combat"
     }
