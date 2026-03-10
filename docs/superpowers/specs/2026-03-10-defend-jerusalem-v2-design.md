@@ -38,16 +38,21 @@ BSF Lesson 22 Build Community activity for Zoom online class. Interactive web ap
 
 ## Phase 2: "Defend Jerusalem"
 - Label changes to "Jerusalem"
-- City rebuilds with golden aura (CSS box-shadow pulse animation)
-- One verse at a time, positioned above city in semi-transparent text panel
+- City rebuilds, health bar resets to 100%
+- **Same wave UI as Phase 1** to create visual contrast:
+  - Wave title: "All Nations Attack Jerusalem"
+  - Subtitle: "I will gather all the nations to Jerusalem to fight against it." — Zechariah 14:2
+  - **One button only**: "Trust in God's Promises" (where 3 options used to be)
+- Click the button → golden aura appears, attack hits but city holds (arrows dissolve)
+- Then verses play one at a time above city:
 
 ### Verse sequence
 1. "I will make Jerusalem an immovable rock for all the nations." - Zechariah 12:3
-   - City rebuilds, golden aura appears. Hold 6s. Fade out verse.
+   - Aura visible. Hold 6s. Fade out verse.
 2. "A fountain will be opened to cleanse them from sin and impurity." - Zechariah 13:1
    - Water flows at base. Aura strengthens. Hold 6s. Fade out verse.
 3. "The LORD will be king over the whole earth." - Zechariah 14:9
-   - Dawn sky. Health bar returns gold: "Jerusalem Restored." Hold 6s. Fade out verse.
+   - Dawn sky. Health bar turns gold: "Jerusalem Restored." Hold 6s. Fade out verse.
 4. Main Truth fades in: "Jesus will defeat His enemies and reign as King forever without rival."
    - Stays on screen. Discussion launch.
 

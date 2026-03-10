@@ -391,14 +391,17 @@ git add index.html
 git commit -m "feat: bridge transition screen"
 ```
 
-### Task 8: Phase 2 — Verse by Verse with Aura
+### Task 8: Phase 2 — Wave UI Mirror + Verse Sequence with Aura
 
-- [ ] **Step 1: Build verse display panel**
+Phase 2 reuses the same wave UI layout as Phase 1 to make the contrast visual.
 
-`#verse-panel` positioned at `top: 15%`, centered, `max-width: 70%`:
-- Semi-transparent background `rgba(10, 10, 26, 0.7)`
-- Single verse text (Cinzel 24px, gold) + reference (Inter 13px, muted)
-- Fades in/out via `.visible` class with CSS transitions
+- [ ] **Step 1: Build Phase 2 wave panel (mirrors Phase 1)**
+
+Reuse the same `#attack-panel` layout:
+- Wave title: **"All Nations Attack Jerusalem"** (Cinzel 24px, red — same as Phase 1)
+- Subtitle: *"I will gather all the nations to Jerusalem to fight against it." — Zechariah 14:2*
+- **One button only**: "Trust in God's Promises" (same `.choice-btn` style)
+- The single button where 3 used to be is the visual contrast
 
 - [ ] **Step 2: Add golden aura CSS**
 
@@ -414,54 +417,69 @@ git commit -m "feat: bridge transition screen"
   box-shadow: 0 0 40px rgba(200, 170, 100, 0.5), 0 0 70px rgba(200, 170, 100, 0.25); }
 ```
 
-- [ ] **Step 3: Implement Phase 2 sequence**
+- [ ] **Step 3: Build verse display panel**
+
+`#verse-panel` positioned at `top: 15%`, centered, `max-width: 70%`:
+- Semi-transparent background `rgba(10, 10, 26, 0.7)`
+- Single verse text (Cinzel 24px, gold) + reference (Inter 13px, muted)
+- Fades in/out via `.visible` class with CSS transitions
+
+- [ ] **Step 4: Implement Phase 2 sequence**
 
 ```
 startPhase2():
   1. Change label from "Castle Defense" to "Jerusalem"
-  2. Hide health bar
-  3. Show verse panel
+  2. Reset health bar to 100%
+  3. Rebuild city (remove .fallen, add .restored)
+  4. Lift dark overlay
+  5. Show attack panel with:
+     - Title: "All Nations Attack Jerusalem"
+     - Subtitle: Zechariah 14:2 quote
+     - Single button: "Trust in God's Promises"
 
-  At 500ms:
-    - Show verse 1 text ("I will make Jerusalem an immovable rock...")
-    - Rebuild city (remove .fallen, add .restored)
-    - Add .aura-1 to city
-    - Lift dark overlay
+  On click "Trust in God's Promises":
+  6. Golden aura appears on city (.aura-1)
+  7. Attack animation plays (arrows, shake) — but city does NOT fall
+     - Arrows dissolve/fade before hitting, aura flashes brighter
+  8. Hide attack panel
+  9. Begin verse sequence:
 
-  At 6500ms:
-    - Fade out verse 1
+  At 1500ms after attack:
+    - Show verse 1 ("I will make Jerusalem an immovable rock...")
+    - Aura stays at .aura-1
+    - Hold 6s. Fade out.
 
-  At 7500ms:
+  At 8500ms:
     - Show verse 2 ("A fountain will be opened...")
-    - Add water flowing
+    - Water flows at base
     - Upgrade to .aura-2
+    - Hold 6s. Fade out.
 
-  At 13500ms:
-    - Fade out verse 2
-
-  At 14500ms:
+  At 15500ms:
     - Show verse 3 ("The LORD will be king...")
     - Dawn sky
-    - Show health bar as gold "Jerusalem Restored"
+    - Health bar turns gold: "Jerusalem Restored"
     - Upgrade to .aura-3
+    - Hold 6s. Fade out.
 
-  At 20500ms:
-    - Fade out verse 3
-
-  At 22000ms:
+  At 22500ms:
     - Show Main Truth: "Jesus will defeat His enemies and reign as King forever without rival."
     - Stays on screen. Done.
 ```
 
-- [ ] **Step 4: Verify full Phase 2 sequence**
+- [ ] **Step 5: Verify full Phase 2 sequence**
 
-Play through entire game into Phase 2. Screenshot each verse state and final Main Truth screen.
+Play through entire game into Phase 2. Verify:
+- Same wave UI layout but only 1 option
+- Attack hits but city holds (aura flashes)
+- Verses play one at a time above city
+- Main Truth lands as final screen
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add index.html
-git commit -m "feat: verse-by-verse Phase 2 with golden aura"
+git commit -m "feat: Phase 2 with wave UI mirror, aura, verse sequence"
 ```
 
 ### Task 9: Final Polish + Push
