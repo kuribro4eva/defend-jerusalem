@@ -41,7 +41,7 @@ BSF Lesson 22 Build Community activity for Zoom online class. Interactive web ap
 - City rebuilds, health bar resets to 100%
 - **Same wave UI as Phase 1** to create visual contrast:
   - Wave title: "All Nations Attack Jerusalem"
-  - Subtitle: "I will gather all the nations to Jerusalem to fight against it." — Zechariah 14:2
+  - Subtitle: "All the nations of the earth are gathered against her." — Zechariah 12:3
   - **One button only**: "Trust in God's Promises" (where 3 options used to be)
 - Click the button → golden aura appears, attack hits but city holds (arrows dissolve)
 - Then verses play one at a time above city:

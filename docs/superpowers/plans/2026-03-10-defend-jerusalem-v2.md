@@ -399,7 +399,7 @@ Phase 2 reuses the same wave UI layout as Phase 1 to make the contrast visual.
 
 Reuse the same `#attack-panel` layout:
 - Wave title: **"All Nations Attack Jerusalem"** (Cinzel 24px, red — same as Phase 1)
-- Subtitle: *"I will gather all the nations to Jerusalem to fight against it." — Zechariah 14:2*
+- Subtitle: *"All the nations of the earth are gathered against her." — Zechariah 12:3*
 - **One button only**: "Trust in God's Promises" (same `.choice-btn` style)
 - The single button where 3 used to be is the visual contrast
 
@@ -434,7 +434,7 @@ startPhase2():
   4. Lift dark overlay
   5. Show attack panel with:
      - Title: "All Nations Attack Jerusalem"
-     - Subtitle: Zechariah 14:2 quote
+     - Subtitle: Zechariah 12:3a quote ("All the nations of the earth are gathered against her.")
      - Single button: "Trust in God's Promises"
 
   On click "Trust in God's Promises":
