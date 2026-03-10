@@ -727,21 +727,22 @@
   var wavesSurvived = 0;
 
   // damage: 0 = hold out (no health loss), >0 = health drops by that amount
-  // Best picks (least damage):
-  //   [0] Raise the Shields (0), [1] Brace the Gate with Timber (0), [2] Launch Fire at the Towers (0),
-  //   [3] Ration What's Left Carefully (0), [4] Pour Water into the Tunnels (0),
-  //   [5] Raid and Destroy Their Catapults (0), [6] Build Barricades and Dig Trenches (10),
-  //   [7] Post Archers on the Highest Towers (15), [8] Flood the Tunnels with Water (20),
+  // Best picks (least damage): every wave costs HP, no free rides
+  //   [0] Raise the Shields (7), [1] Barricade the Gate (6), [2] Launch Fire at the Towers (6),
+  //   [3] Ration What's Left Carefully (5), [4] Pour Water into the Tunnels (5),
+  //   [5] Raid and Destroy Their Catapults (5), [6] Build Barricades and Dig Trenches (4),
+  //   [7] Post Archers on the Highest Towers (4), [8] Flood the Tunnels with Water (3),
   //   [9] all 100 (auto-kill)
-  // Best case: 0+0+0+0+0+0+10+15+20 = 45 damage → reach wave 10 at 55 HP
+  // Best case: 7+6+6+5+5+5+4+4+3 = 45 damage → reach wave 10 at 55 HP
+  // Worst case: 14+13+12+11+11+10+9+8+7 = 95 damage → reach wave 10 at 5 HP
   var waves = [
     {
       title: "Archers Attack",
       subtitle: "A line of enemy archers fires on your walls",
       choices: ["Raise the Shields", "Fire Arrows Back", "Hide Inside the Buildings"],
-      damage: [0, 10, 5],
+      damage: [7, 14, 10],
       results: [
-        "The shields deflect the arrows! The walls hold.",
+        "The shields block most arrows\u2026 but a few get through.",
         "Your archers trade volleys\u2026 but you lose more than they do.",
         "You\u2019re safe for now, but you\u2019ve given up the wall positions."
       ],
@@ -750,12 +751,12 @@
     {
       title: "Battering Ram at the Gate",
       subtitle: "A massive ram pounds against the main gate",
-      choices: ["Brace the Gate with Timber", "Drop Rocks on the Ram Crew", "Send Soldiers Out to Fight"],
-      damage: [0, 5, 10],
+      choices: ["Barricade the Gate", "Drop Rocks on the Ram Crew", "Send Soldiers Out to Fight"],
+      damage: [6, 13, 9],
       results: [
-        "The timber braces hold! The gate stands firm.",
-        "Some rocks land, but the ram is heavily armored.",
-        "Your soldiers are exposed outside the walls and driven back."
+        "The barricade holds\u2026 but the gate cracks under the strain.",
+        "Your soldiers are exposed outside the walls and driven back.",
+        "Some rocks land, but the ram is heavily armored."
       ],
       defenseAnim: "defense-supplies"
     },
@@ -763,11 +764,11 @@
       title: "Siege Towers Rolling In",
       subtitle: "Wooden siege towers approach the walls",
       choices: ["Launch Fire at the Towers", "Rally Troops at the Walls", "Dig a Trench"],
-      damage: [0, 5, 10],
+      damage: [6, 12, 9],
       results: [
-        "Direct hit! The wooden towers burn to the ground.",
-        "Your troops hold the wall, but the towers keep coming.",
-        "The trench slows them, but they fill it with rubble and press on."
+        "Two towers burn\u2026 but the third reaches the wall.",
+        "The trench slows them, but they fill it with rubble and press on.",
+        "Your troops hold the wall, but the towers keep coming."
       ],
       defenseAnim: "defense-unity"
     },
@@ -775,11 +776,11 @@
       title: "Food and Water Running Out",
       subtitle: "The siege drags on and supplies are low",
       choices: ["Ration What\u2019s Left Carefully", "Send Scouts to Find Supplies", "Try to Break Through the Siege Lines"],
-      damage: [0, 10, 10],
+      damage: [5, 11, 8],
       results: [
-        "Careful rationing keeps the garrison fed. Morale holds.",
-        "The scouts are captured. No supplies get through.",
-        "The breakout fails. Most are captured or driven back."
+        "Careful rationing helps, but the people grow weak.",
+        "The breakout fails. Most are captured or driven back.",
+        "The scouts are captured. No supplies get through."
       ],
       defenseAnim: "defense-supplies"
     },
@@ -787,11 +788,11 @@
       title: "Enemies Digging Under the Walls",
       subtitle: "You hear tunneling beneath the foundations",
       choices: ["Pour Water into the Tunnels", "Dig Tunnels to Meet Them", "Send Soldiers Outside to Stop Them"],
-      damage: [0, 10, 15],
+      damage: [5, 11, 8],
       results: [
-        "Water floods the tunnels! The diggers retreat.",
-        "Your diggers meet theirs underground\u2026 heavy losses on both sides.",
-        "Your soldiers are ambushed outside the walls."
+        "Water floods the tunnels\u2026 but the foundations are weakened.",
+        "Your soldiers are ambushed outside the walls.",
+        "Your diggers meet theirs underground\u2026 heavy losses on both sides."
       ],
       defenseAnim: "defense-walls"
     },
@@ -799,11 +800,11 @@
       title: "Flaming Rocks Rain Down",
       subtitle: "Fire catapults bombard the city",
       choices: ["Raid and Destroy Their Catapults", "Organize Teams to Fight Fires", "Retreat to the Inner Keep"],
-      damage: [0, 10, 15],
+      damage: [5, 10, 7],
       results: [
-        "A daring raid destroys their catapults! The fires stop.",
-        "Teams slow the damage, but buildings still burn.",
-        "The outer city burns. You lose ground and supplies."
+        "A daring raid destroys most catapults\u2026 but not all.",
+        "The outer city burns. You lose ground and supplies.",
+        "Teams slow the damage, but buildings still burn."
       ],
       defenseAnim: "defense-combat"
     },
@@ -811,11 +812,11 @@
       title: "Horsemen Charge the Walls",
       subtitle: "Mounted warriors thunder toward you",
       choices: ["Build Barricades and Dig Trenches", "Line Up Spearmen at the Walls", "Open the Gates and Charge Out"],
-      damage: [10, 15, 20],
+      damage: [4, 9, 7],
       results: [
         "The barricades slow the charge\u2026 but they find a way around.",
-        "The spearmen hold for a time, but there aren\u2019t enough.",
-        "A brave charge\u2026 but you are outnumbered five to one."
+        "A brave charge\u2026 but you are outnumbered five to one.",
+        "The spearmen hold for a time, but there aren\u2019t enough."
       ],
       defenseAnim: "defense-walls"
     },
@@ -823,11 +824,11 @@
       title: "Attack in the Dark",
       subtitle: "Under cover of night, soldiers scale the walls",
       choices: ["Post Archers on the Highest Towers", "Light Fires Along the Walls", "Send Patrols Along the Wall"],
-      damage: [15, 20, 25],
+      damage: [4, 8, 6],
       results: [
         "Your archers pick off many climbers\u2026 but some still slip through.",
-        "The fires reveal some, but others breach the wall unseen.",
-        "The patrols are spread too thin. Several breaches open."
+        "The patrols are spread too thin. Several breaches open.",
+        "The fires reveal some, but others breach the wall unseen."
       ],
       defenseAnim: "defense-unity"
     },
@@ -835,11 +836,11 @@
       title: "The Ground Shakes",
       subtitle: "They\u2019re tunneling under the city itself",
       choices: ["Flood the Tunnels with Water", "Collapse Buildings to Block Them", "Abandon the Outer District"],
-      damage: [20, 25, 30],
+      damage: [3, 7, 5],
       results: [
         "Water slows the diggers, but the foundations are already cracked.",
-        "Buildings fall and slow them\u2026 but new tunnels open elsewhere.",
-        "You lose a third of the city. The enemy pours in."
+        "You lose a third of the city. The enemy pours in.",
+        "Buildings fall and slow them\u2026 but new tunnels open elsewhere."
       ],
       defenseAnim: "defense-combat"
     },
@@ -1082,8 +1083,9 @@
   function selectDefense(choiceIndex) {
     var wave = waves[currentWave];
     var damage = wave.damage[choiceIndex];
+    var minDamage = Math.min.apply(null, wave.damage);
     var buttons = document.querySelectorAll('.choice-btn');
-    var isGoodChoice = damage === 0;
+    var isGoodChoice = damage === minDamage;
 
     // Disable + highlight
     buttons.forEach(function(b) { b.style.pointerEvents = 'none'; b.style.opacity = '0.4'; });
@@ -1106,14 +1108,13 @@
 
   function playAttack(wave, choiceIndex) {
     var damage = wave.damage[choiceIndex];
-    var isGoodChoice = damage === 0;
+    var minDamage = Math.min.apply(null, wave.damage);
+    var isGoodChoice = damage === minDamage;
 
-    // Shake (stronger for bad choices)
+    // Shake (stronger for bad choices, mild for good)
     var scene = document.getElementById('scene');
-    if (!isGoodChoice) {
-      scene.classList.add('shaking');
-      setTimeout(function() { scene.classList.remove('shaking'); }, 600);
-    }
+    scene.classList.add('shaking');
+    setTimeout(function() { scene.classList.remove('shaking'); }, isGoodChoice ? 300 : 600);
 
     // Arrows (always), fire (later waves or bad choices)
     spawnArrows(isGoodChoice);
