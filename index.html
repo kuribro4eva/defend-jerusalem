@@ -469,12 +469,12 @@
     left: 0;
     right: 0;
     height: 30%;
-    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 10px 20px;
   }
+  #attack-panel.active { display: flex; }
   #wave-title {
     font-family: 'Cinzel', serif;
     font-size: clamp(28px, 3.5vw, 52px);
@@ -515,25 +515,48 @@
   }
   .choice-btn:active { transform: translateY(0); }
 
-  /* Result text */
-  #result-text {
+  /* Result dialog overlay */
+  #result-overlay {
     position: absolute;
-    top: 25%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #result-overlay.visible { opacity: 1; pointer-events: auto; }
+  #result-text {
     font-family: 'Cinzel', serif;
     font-size: clamp(18px, 2.2vw, 32px);
     color: #c0392b;
     text-align: center;
-    opacity: 0;
-    transition: opacity 0.8s ease;
-    z-index: 101;
     text-shadow: 0 0 20px rgba(192, 57, 43, 0.4);
-    pointer-events: none;
-    max-width: 550px;
+    max-width: 600px;
+    width: 85%;
     line-height: 1.5;
+    padding: clamp(20px, 2.5vw, 40px) clamp(28px, 3.5vw, 56px);
+    background: rgba(10, 10, 20, 0.85);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
   }
-  #result-text.visible { opacity: 1; }
+  #result-overlay.visible #result-text { transform: scale(1); }
+  #result-dismiss {
+    display: block;
+    margin-top: clamp(10px, 1.2vw, 18px);
+    font-size: clamp(14px, 1.4vw, 20px);
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1;
+    transition: color 0.2s;
+    font-family: 'Cinzel', serif;
+  }
+  #result-text:hover #result-dismiss { color: rgba(255, 255, 255, 0.8); }
 
   /* Bridge panel */
   #bridge-panel {
@@ -579,42 +602,50 @@
   }
 
   /* Verse panel */
-  #verse-panel {
+  /* Active verse display — above castle */
+  #verse-display {
     position: absolute;
-    top: 12%;
+    top: 10%;
     left: 50%;
     transform: translateX(-50%);
-    max-width: 65%;
+    max-width: 70%;
     width: 85%;
     text-align: center;
+    z-index: 110;
+    pointer-events: none;
     background: rgba(10, 10, 26, 0.7);
     padding: 24px 32px 20px;
     border-radius: 8px;
-    z-index: 110;
-    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s ease;
   }
-  #verse-text {
+  #verse-display.visible { opacity: 1; }
+  #verse-display-text {
     font-family: 'Cinzel', serif;
     font-size: clamp(22px, 2.8vw, 40px);
     font-weight: 700;
     color: #d4a860;
     line-height: 1.4;
     margin-bottom: 8px;
-    opacity: 0;
-    transform: translateY(15px);
-    transition: all 1.2s ease;
   }
-  #verse-text.visible { opacity: 1; transform: translateY(0); }
-  #verse-ref {
+  #verse-display-ref {
     font-family: 'Inter', sans-serif;
     font-size: clamp(12px, 1.4vw, 20px);
     color: #8a7a60;
-    opacity: 0;
-    transition: opacity 1.2s ease 0.3s;
   }
-  #verse-ref.visible { opacity: 1; }
 
-  /* Main truth */
+  /* Main truth — above castle (same position as verse-display) */
+  #main-truth-panel {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 70%;
+    width: 85%;
+    text-align: center;
+    z-index: 111;
+    pointer-events: none;
+  }
   #main-truth {
     font-family: 'Cinzel', serif;
     font-size: clamp(20px, 2.6vw, 38px);
@@ -624,11 +655,49 @@
     opacity: 0;
     transform: translateY(15px);
     transition: all 1.5s ease;
-    margin-top: 12px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(200, 160, 80, 0.3);
+    background: rgba(10, 10, 26, 0.7);
+    padding: 24px 32px;
+    border-radius: 8px;
   }
   #main-truth.visible { opacity: 1; transform: translateY(0); }
+
+  /* Verse stack — bottom area (accumulated verses) */
+  #verse-stack {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(4px, 0.6vw, 10px);
+    z-index: 110;
+    pointer-events: none;
+    padding: 10px 20px;
+    background: #0a0a1a;
+  }
+  .verse-line {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 1.2s ease;
+    text-align: center;
+  }
+  .verse-line.visible { opacity: 1; transform: translateY(0); }
+  .verse-line-text {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(22px, 2.8vw, 42px);
+    font-weight: 700;
+    color: #d4a860;
+    line-height: 1.3;
+  }
+  .verse-line-ref {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(10px, 1.1vw, 16px);
+    color: #8a7a60;
+    margin-top: 2px;
+  }
 
   /* Dark overlay */
   #dark-overlay {
@@ -695,8 +764,10 @@
         <div id="choices"></div>
       </div>
 
-      <!-- Result text -->
-      <div id="result-text"></div>
+      <!-- Result dialog -->
+      <div id="result-overlay">
+        <div id="result-text"><span id="result-msg"></span><span id="result-dismiss">tap to continue</span></div>
+      </div>
 
       <!-- Castle fallen (brief flash between rounds) -->
       <div class="panel" id="fallen-panel">
@@ -711,10 +782,31 @@
       </div>
 
       <!-- Verse display -->
-      <div id="verse-panel" style="display:none;">
-        <div id="verse-text"></div>
-        <div id="verse-ref"></div>
+      <!-- Active verse — above castle -->
+      <div id="verse-display">
+        <div id="verse-display-text"></div>
+        <div id="verse-display-ref"></div>
+      </div>
+
+      <!-- Main truth — above castle -->
+      <div id="main-truth-panel">
         <div id="main-truth">Jesus will defeat His enemies and reign as King forever without rival.</div>
+      </div>
+
+      <!-- Verse stack — bottom area -->
+      <div id="verse-stack" style="display:none;">
+        <div class="verse-line" id="verse-line-0">
+          <div class="verse-line-text">&ldquo;I will make Jerusalem an immovable rock for all the nations.&rdquo;</div>
+          <div class="verse-line-ref">Zechariah 12:3</div>
+        </div>
+        <div class="verse-line" id="verse-line-1">
+          <div class="verse-line-text">&ldquo;A fountain will be opened to cleanse them from sin and impurity.&rdquo;</div>
+          <div class="verse-line-ref">Zechariah 13:1</div>
+        </div>
+        <div class="verse-line" id="verse-line-2">
+          <div class="verse-line-text">&ldquo;The LORD will be king over the whole earth.&rdquo;</div>
+          <div class="verse-line-ref">Zechariah 14:9</div>
+        </div>
       </div>
     </div>
   </div>
@@ -850,9 +942,9 @@
       choices: ["Man Every Wall", "Guard the Gate", "Charge Out to Fight"],
       damage: [100, 100, 100],
       results: [
-        "You spread too thin. They break through everywhere.",
-        "The gate holds, but they pour over the undefended walls.",
-        "A brave charge\u2026 but there are too many. The city falls."
+        "You spread your defenders across every wall — but there aren't enough left. They break through everywhere at once.",
+        "The gate holds strong, but with everyone there, the walls are left empty. They pour over from every side.",
+        "A courageous charge into the open — but the enemy surrounds you. With no one left to defend, the city falls."
       ],
       defenseAnim: "defense-combat"
     }
@@ -1085,7 +1177,8 @@
     var damage = wave.damage[choiceIndex];
     var minDamage = Math.min.apply(null, wave.damage);
     var buttons = document.querySelectorAll('.choice-btn');
-    var isGoodChoice = damage === minDamage;
+    var allSameDamage = Math.min.apply(null, wave.damage) === Math.max.apply(null, wave.damage);
+    var isGoodChoice = !allSameDamage && damage === minDamage;
 
     // Disable + highlight
     buttons.forEach(function(b) { b.style.pointerEvents = 'none'; b.style.opacity = '0.4'; });
@@ -1109,7 +1202,8 @@
   function playAttack(wave, choiceIndex) {
     var damage = wave.damage[choiceIndex];
     var minDamage = Math.min.apply(null, wave.damage);
-    var isGoodChoice = damage === minDamage;
+    var allSameDamage = Math.min.apply(null, wave.damage) === Math.max.apply(null, wave.damage);
+    var isGoodChoice = !allSameDamage && damage === minDamage;
 
     // Shake (stronger for bad choices, mild for good)
     var scene = document.getElementById('scene');
@@ -1127,40 +1221,43 @@
       updateCityDamage();
     }, 500);
 
-    // Result text
+    // Result dialog — stays until clicked
     setTimeout(function() {
-      var rt = document.getElementById('result-text');
-      rt.textContent = wave.results[choiceIndex];
+      var overlay = document.getElementById('result-overlay');
+      var msg = document.getElementById('result-msg');
+      msg.textContent = wave.results[choiceIndex];
       if (isGoodChoice) {
-        rt.style.color = '#2ecc71';
-        rt.style.textShadow = '0 0 20px rgba(46, 204, 113, 0.4)';
+        msg.style.color = '#2ecc71';
+        msg.style.textShadow = '0 0 20px rgba(46, 204, 113, 0.4)';
       } else {
-        rt.style.color = '#c0392b';
-        rt.style.textShadow = '0 0 20px rgba(192, 57, 43, 0.4)';
+        msg.style.color = '#c0392b';
+        msg.style.textShadow = '0 0 20px rgba(192, 57, 43, 0.4)';
       }
-      rt.classList.add('visible');
-    }, 1200);
+      overlay.classList.add('visible');
 
-    // Update wave counter + next
-    setTimeout(function() {
-      document.getElementById('result-text').classList.remove('visible');
+      // Hide attack panel immediately if city is falling
+      if (health <= 0) { showPanel(null); }
 
-      if (health <= 0) {
-        // City fallen — go to bridge
-        showPanel(null);
-        setTimeout(function() {
+      // Click anywhere on overlay to dismiss and advance
+      function dismissResult() {
+        overlay.removeEventListener('click', dismissResult);
+        overlay.classList.remove('visible');
+
+        if (health <= 0) {
+          // City fallen — show bridge
           document.getElementById('dark-overlay').classList.add('active');
           var counter = document.getElementById('wave-counter');
           counter.textContent = 'Waves Survived: ' + wavesSurvived;
-          setTimeout(function() { showPanel('bridge-panel'); }, 1500);
-        }, 500);
-      } else {
-        // Survived — next wave
-        wavesSurvived++;
-        document.getElementById('wave-counter').textContent = 'Wave ' + (currentWave + 2) + ' / 10';
-        setTimeout(function() { showWave(currentWave + 1); }, 1000);
+          setTimeout(function() { showPanel('bridge-panel'); }, 800);
+        } else {
+          // Survived — show next wave immediately
+          wavesSurvived++;
+          document.getElementById('wave-counter').textContent = 'Wave ' + (currentWave + 2) + ' / 10';
+          showWave(currentWave + 1);
+        }
       }
-    }, 3500);
+      overlay.addEventListener('click', dismissResult);
+    }, 1200);
   }
 
   // ── PHASE 2 ──
@@ -1178,21 +1275,26 @@
     document.getElementById('dark-overlay').classList.remove('active');
     document.getElementById('dark-overlay').classList.add('clearing');
 
-    // Show Phase 2 wave panel (mirrors Phase 1)
+    // Show Phase 2 wave panel (mirrors Phase 1 with 3 identical buttons)
     document.getElementById('wave-title').textContent = 'All Nations Attack Jerusalem';
     document.getElementById('wave-subtitle').textContent = '\u201CAll the nations of the earth are gathered against her.\u201D \u2014 Zechariah 12:3';
 
     var choicesDiv = document.getElementById('choices');
     while (choicesDiv.firstChild) { choicesDiv.removeChild(choicesDiv.firstChild); }
 
-    var trustBtn = document.createElement('button');
-    trustBtn.className = 'choice-btn';
-    trustBtn.textContent = 'Trust in God\u2019s Promises';
-    trustBtn.style.minWidth = '220px';
-    trustBtn.style.borderColor = '#8a7a50';
-    trustBtn.style.color = '#d4a860';
-    trustBtn.addEventListener('click', function() { onTrustClicked(); });
-    choicesDiv.appendChild(trustBtn);
+    for (var i = 0; i < 3; i++) {
+      var trustBtn = document.createElement('button');
+      trustBtn.className = 'choice-btn';
+      trustBtn.textContent = 'Trust in God\u2019s Promises';
+      trustBtn.style.borderColor = '#8a7a50';
+      trustBtn.style.color = '#d4a860';
+      trustBtn.addEventListener('click', function() { onTrustClicked(); });
+      choicesDiv.appendChild(trustBtn);
+    }
+
+    // Remove wave theme colors from attack panel
+    var ap = document.getElementById('attack-panel');
+    ap.className = 'panel';
 
     showPanel('attack-panel');
   }
@@ -1204,6 +1306,9 @@
 
     setTimeout(function() {
       showPanel(null);
+      // Show verse stack and hide ground to get clean background
+      document.getElementById('verse-stack').style.display = 'flex';
+      document.getElementById('ground').style.display = 'none';
       var city = document.getElementById('city-container');
 
       // Aura appears
@@ -1230,76 +1335,63 @@
   }
 
   function playVerseSequence() {
-    var versePanel = document.getElementById('verse-panel');
-    var verseText = document.getElementById('verse-text');
-    var verseRef = document.getElementById('verse-ref');
     var city = document.getElementById('city-container');
-    versePanel.style.display = 'block';
+    var display = document.getElementById('verse-display');
+    var displayText = document.getElementById('verse-display-text');
+    var displayRef = document.getElementById('verse-display-ref');
+    var stack = document.getElementById('verse-stack');
 
     var verses = [
-      {
-        text: '\u201CI will make Jerusalem an immovable rock for all the nations.\u201D',
-        ref: 'Zechariah 12:3',
-        action: function() {
-          // Aura already at 1
-        }
+      { text: '\u201CI will make Jerusalem an immovable rock for all the nations.\u201D', ref: 'Zechariah 12:3' },
+      { text: '\u201CA fountain will be opened to cleanse them from sin and impurity.\u201D', ref: 'Zechariah 13:1' },
+      { text: '\u201CThe LORD will be king over the whole earth.\u201D', ref: 'Zechariah 14:9' }
+    ];
+
+    var actions = [
+      function() { /* aura already at 1 */ },
+      function() {
+        document.getElementById('water').classList.add('flowing');
+        city.classList.remove('aura-1');
+        city.classList.add('aura-2');
       },
-      {
-        text: '\u201CA fountain will be opened to cleanse them from sin and impurity.\u201D',
-        ref: 'Zechariah 13:1',
-        action: function() {
-          document.getElementById('water').classList.add('flowing');
-          city.classList.remove('aura-1');
-          city.classList.add('aura-2');
-        }
-      },
-      {
-        text: '\u201CThe LORD will be king over the whole earth.\u201D',
-        ref: 'Zechariah 14:9',
-        action: function() {
-          document.getElementById('sky').classList.add('dawn');
-          city.classList.remove('aura-2');
-          city.classList.add('aura-3');
-          // Restore health bar as gold
-          var bar = document.getElementById('health-bar');
-          bar.classList.remove('low');
-          bar.classList.add('gold');
-          health = 100;
-          bar.style.width = '100%';
-          document.getElementById('health-label').textContent = 'Jerusalem Restored';
-        }
+      function() {
+        document.getElementById('sky').classList.add('dawn');
+        city.classList.remove('aura-2');
+        city.classList.add('aura-3');
+        var bar = document.getElementById('health-bar');
+        bar.classList.remove('low');
+        bar.classList.add('gold');
+        health = 100;
+        bar.style.width = '100%';
+        document.getElementById('health-label').textContent = 'Jerusalem Restored';
       }
     ];
 
     var delay = 500;
-    verses.forEach(function(v, i) {
-      // Show verse
-      setTimeout(function() {
-        verseText.classList.remove('visible');
-        verseRef.classList.remove('visible');
-
+    for (var i = 0; i < 3; i++) {
+      (function(idx) {
+        // Show verse above castle
         setTimeout(function() {
-          verseText.textContent = v.text;
-          verseRef.textContent = v.ref;
-          verseText.classList.add('visible');
-          verseRef.classList.add('visible');
-          v.action();
-        }, 400);
-      }, delay);
+          displayText.textContent = verses[idx].text;
+          displayRef.textContent = verses[idx].ref;
+          display.classList.add('visible');
+          actions[idx]();
+        }, delay);
 
-      delay += 6500;
-    });
+        // After hold: fade out above, add to bottom stack
+        setTimeout(function() {
+          display.classList.remove('visible');
+          setTimeout(function() {
+            document.getElementById('verse-line-' + idx).classList.add('visible');
+          }, 400);
+        }, delay + 5500);
+      })(i);
+      delay += 7000;
+    }
 
-    // Main truth
+    // Main truth — above castle (after last verse moves down)
     setTimeout(function() {
-      verseText.classList.remove('visible');
-      verseRef.classList.remove('visible');
-
-      setTimeout(function() {
-        verseText.style.display = 'none';
-        verseRef.style.display = 'none';
-        document.getElementById('main-truth').classList.add('visible');
-      }, 600);
+      document.getElementById('main-truth').classList.add('visible');
     }, delay);
   }
 </script>
