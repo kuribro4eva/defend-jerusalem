@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defend Jerusalem</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a1a;
+    color: #e8e0d0;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ── SCENE ── */
+  #scene {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── SKY ── */
+  #sky {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #0a0a2e 0%, #1a1a3e 40%, #2a1a1a 70%, #0a0a1a 100%);
+    transition: background 3s ease;
+    z-index: 0;
+  }
+  #sky.dawn {
+    background: linear-gradient(180deg, #1a2a4e 0%, #3a4a6e 30%, #d4a060 70%, #f0c070 100%);
+  }
+
+  /* ── STARS ── */
+  .star {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite alternate;
+    z-index: 1;
+  }
+  @keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+
+  /* ── GROUND ── */
+  #ground {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 18vh;
+    background: linear-gradient(180deg, #2a1f15 0%, #1a1410 100%);
+    z-index: 5;
+  }
+
+  /* ── CITY ── */
+  #city-container {
+    position: absolute;
+    bottom: 16vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    transition: filter 1s ease;
+  }
+  #city-container.damaged { filter: brightness(0.7) sepia(0.3); }
+  #city-container.destroyed { filter: brightness(0.2) grayscale(1); }
+  #city-container.restored { filter: brightness(1.1) saturate(1.2); }
+
+  .building {
+    position: absolute;
+    bottom: 0;
+    background: #3a3020;
+    border: 1px solid #4a4030;
+    transition: all 0.5s ease;
+  }
+  .building.cracked {
+    clip-path: polygon(0% 0%, 30% 0%, 35% 15%, 45% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+  .building.fallen {
+    transform: scaleY(0.15) scaleX(1.3);
+    opacity: 0.5;
+    border-radius: 2px;
+  }
+  .building.restored {
+    background: #5a4a30;
+    border-color: #8a7a50;
+    box-shadow: 0 0 15px rgba(200, 170, 100, 0.2);
+  }
+
+  /* Wall */
+  #wall {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 420px;
+    height: 45px;
+    background: #4a3a25;
+    border-top: 3px solid #5a4a35;
+    z-index: 8;
+    transition: all 0.5s ease;
+  }
+  #wall .merlon {
+    position: absolute;
+    top: -12px;
+    width: 18px;
+    height: 12px;
+    background: #4a3a25;
+    border: 1px solid #5a4a35;
+  }
+  #wall.cracked { opacity: 0.6; transform: translateX(-50%) scaleY(0.7); }
+  #wall.fallen { opacity: 0.2; transform: translateX(-50%) scaleY(0.15) scaleX(1.2); }
+  #wall.restored {
+    opacity: 1;
+    transform: translateX(-50%) scaleY(1);
+    background: #5a4a30;
+    border-top-color: #8a7a50;
+    box-shadow: 0 0 20px rgba(200, 170, 100, 0.15);
+  }
+
+  /* Gate */
+  #gate {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 32px;
+    background: #1a1410;
+    border-radius: 18px 18px 0 0;
+    border: 2px solid #5a4a35;
+    border-bottom: none;
+    z-index: 9;
+  }
+
+  /* Tower */
+  .tower {
+    position: absolute;
+    bottom: 0;
+    width: 30px;
+    background: #4a3a25;
+    border: 1px solid #5a4a35;
+    z-index: 9;
+    transition: all 0.5s ease;
+  }
+  .tower-cap {
+    position: absolute;
+    top: -8px;
+    left: -3px;
+    width: 36px;
+    height: 10px;
+    background: #5a4a35;
+    border-radius: 2px;
+  }
+  .tower.cracked { transform: rotate(3deg); opacity: 0.7; }
+  .tower.fallen { transform: scaleY(0.2) rotate(8deg); opacity: 0.3; }
+  .tower.restored {
+    transform: rotate(0deg);
+    opacity: 1;
+    background: #5a4a30;
+    box-shadow: 0 0 15px rgba(200, 170, 100, 0.15);
+  }
+
+  /* ── HEALTH BAR ── */
+  #health-bar-container {
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+    z-index: 50;
+    text-align: center;
+  }
+  #health-label {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #a09080;
+    margin-bottom: 6px;
+  }
+  #health-bar-bg {
+    width: 100%;
+    height: 16px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    border: 1px solid #3a3a3a;
+    overflow: hidden;
+  }
+  #health-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #c0392b, #e67e22, #27ae60);
+    border-radius: 8px;
+    transition: width 1.5s ease;
+  }
+  #health-bar.low { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+  #health-bar.gold { background: linear-gradient(90deg, #c8a84e, #e8c85e, #c8a84e); }
+
+  /* ── ATTACK EFFECTS ── */
+  .arrow {
+    position: absolute;
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, #f4a460, #8B4513);
+    z-index: 20;
+    transform-origin: right center;
+  }
+  .arrow::after {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: -4px;
+    border-left: 10px solid #666;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+  }
+
+  .fire {
+    position: absolute;
+    width: 20px;
+    height: 30px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    z-index: 25;
+    animation: flicker 0.3s ease-in-out infinite alternate;
+  }
+  @keyframes flicker {
+    0% { transform: scale(1) rotate(-2deg); opacity: 0.8; }
+    100% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+  }
+
+  .smoke {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle, rgba(80,80,80,0.4), transparent);
+    border-radius: 50%;
+    z-index: 24;
+    animation: rise 3s ease-out forwards;
+  }
+  @keyframes rise {
+    0% { transform: translateY(0) scale(1); opacity: 0.6; }
+    100% { transform: translateY(-120px) scale(2.5); opacity: 0; }
+  }
+
+  /* Screen shake */
+  @keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-8px, -5px); }
+    20% { transform: translate(7px, 4px); }
+    30% { transform: translate(-6px, 6px); }
+    40% { transform: translate(5px, -4px); }
+    50% { transform: translate(-4px, 3px); }
+    60% { transform: translate(6px, -6px); }
+    70% { transform: translate(-3px, 5px); }
+    80% { transform: translate(4px, -3px); }
+    90% { transform: translate(-5px, 2px); }
+  }
+  #scene.shaking { animation: shake 0.6s ease-in-out; }
+
+  /* ── WATER (Phase 2) ── */
+  #water {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 0;
+    background: linear-gradient(180deg, rgba(70, 130, 180, 0.3), rgba(70, 130, 180, 0.1));
+    z-index: 6;
+    transition: height 3s ease;
+  }
+  #water.flowing { height: 6vh; }
+
+  /* ── UI PANELS ── */
+  #ui-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .panel {
+    pointer-events: auto;
+    text-align: center;
+    display: none;
+  }
+  .panel.active { display: block; }
+
+  /* Title screen */
+  #title-panel h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: #d4a860;
+    text-shadow: 0 2px 20px rgba(200, 160, 80, 0.3);
+    margin-bottom: 12px;
+  }
+  #title-panel p {
+    font-size: 18px;
+    color: #a09080;
+    margin-bottom: 36px;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 14px 36px;
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 700;
+    border: 2px solid #8a7a50;
+    background: rgba(60, 50, 30, 0.8);
+    color: #d4a860;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 1px;
+  }
+  .btn:hover {
+    background: rgba(100, 80, 40, 0.8);
+    box-shadow: 0 0 20px rgba(200, 160, 80, 0.2);
+    transform: translateY(-2px);
+  }
+
+  /* Attack panel */
+  #attack-panel {
+    position: absolute;
+    bottom: 6vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 700px;
+  }
+  #wave-title {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #c0392b;
+    text-shadow: 0 0 30px rgba(192, 57, 43, 0.4);
+    margin-bottom: 8px;
+  }
+  #wave-subtitle {
+    font-size: 14px;
+    color: #a09080;
+    margin-bottom: 20px;
+  }
+  #choices {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .choice-btn {
+    padding: 12px 24px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border: 1px solid #5a5040;
+    background: rgba(40, 35, 25, 0.9);
+    color: #d4c4a0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 160px;
+  }
+  .choice-btn:hover {
+    border-color: #c0392b;
+    background: rgba(80, 30, 20, 0.6);
+    color: #f0d0a0;
+    transform: translateY(-2px);
+  }
+  .choice-btn:active { transform: translateY(0); }
+
+  /* Result text */
+  #result-text {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    color: #c0392b;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    z-index: 101;
+    text-shadow: 0 0 20px rgba(192, 57, 43, 0.4);
+    pointer-events: none;
+    max-width: 600px;
+    line-height: 1.5;
+  }
+  #result-text.visible { opacity: 1; }
+
+  /* Fallen panel */
+  #fallen-panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  #fallen-panel h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 40px;
+    font-weight: 900;
+    color: #8a2020;
+    text-shadow: 0 0 40px rgba(138, 32, 32, 0.5);
+    margin-bottom: 40px;
+  }
+
+  /* Promise panel */
+  #promise-panel {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    max-width: 650px;
+    width: 90%;
+    background: rgba(10, 10, 26, 0.6);
+    padding: 30px 36px 24px;
+    border-radius: 8px;
+  }
+  .promise-verse {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #d4a860;
+    line-height: 1.4;
+    margin-bottom: 6px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 1.5s ease;
+  }
+  .promise-verse.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .promise-ref {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #8a7a60;
+    margin-bottom: 28px;
+    opacity: 0;
+    transition: opacity 1.5s ease 0.3s;
+  }
+  .promise-ref.visible { opacity: 1; }
+
+  /* Main truth */
+  #main-truth {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #e8c85e;
+    line-height: 1.6;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 2s ease;
+    border-top: 1px solid rgba(200, 160, 80, 0.3);
+    padding-top: 20px;
+    margin-top: 8px;
+  }
+  #main-truth.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Dark overlay */
+  #dark-overlay {
+    position: absolute;
+    inset: 0;
+    background: #0a0a1a;
+    z-index: 90;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 2s ease;
+  }
+  #dark-overlay.active { opacity: 0.85; pointer-events: auto; }
+  #dark-overlay.clearing { opacity: 0; }
+</style>
+</head>
+<body>
+
+<div id="scene">
+  <div id="sky"></div>
+  <div id="dark-overlay"></div>
+
+  <!-- Stars -->
+  <div id="stars"></div>
+
+  <!-- City -->
+  <div id="city-container">
+    <div id="wall">
+      <div id="gate"></div>
+    </div>
+    <div class="tower" id="tower-left" style="left: -20px; height: 80px;">
+      <div class="tower-cap"></div>
+    </div>
+    <div class="tower" id="tower-right" style="right: -20px; height: 80px;">
+      <div class="tower-cap"></div>
+    </div>
+    <div class="building" id="b1" style="left: 20px; width: 50px; height: 70px;"></div>
+    <div class="building" id="b2" style="left: 80px; width: 40px; height: 100px;"></div>
+    <div class="building" id="b3" style="left: 130px; width: 55px; height: 85px;"></div>
+    <div class="building" id="b4" style="left: 200px; width: 45px; height: 110px;"></div>
+    <div class="building" id="b5" style="left: 260px; width: 50px; height: 75px;"></div>
+    <div class="building" id="b6" style="left: 320px; width: 40px; height: 95px;"></div>
+    <div class="building" id="b7" style="left: 370px; width: 30px; height: 65px;"></div>
+  </div>
+
+  <div id="water"></div>
+  <div id="ground"></div>
+
+  <!-- Health bar -->
+  <div id="health-bar-container">
+    <div id="health-label">Jerusalem</div>
+    <div id="health-bar-bg">
+      <div id="health-bar"></div>
+    </div>
+  </div>
+
+  <!-- UI Overlay -->
+  <div id="ui-overlay">
+    <div class="panel active" id="title-panel">
+      <h1>Defend Jerusalem</h1>
+      <p>Can you protect God's city?</p>
+      <button class="btn" id="start-btn">Begin</button>
+    </div>
+
+    <div class="panel" id="attack-panel">
+      <div id="wave-title"></div>
+      <div id="wave-subtitle">Choose your defense</div>
+      <div id="choices"></div>
+    </div>
+
+    <div id="result-text"></div>
+
+    <div class="panel" id="fallen-panel">
+      <h2>Jerusalem has fallen.</h2>
+      <button class="btn" id="promise-btn">"But God promised..."</button>
+    </div>
+
+    <div class="panel" id="promise-panel">
+      <div class="promise-verse" id="p1-verse">"I will make Jerusalem an immovable rock for all the nations."</div>
+      <div class="promise-ref" id="p1-ref">Zechariah 12:3</div>
+      <div class="promise-verse" id="p2-verse">"A fountain will be opened to cleanse them from sin and impurity."</div>
+      <div class="promise-ref" id="p2-ref">Zechariah 13:1</div>
+      <div class="promise-verse" id="p3-verse">"The LORD will be king over the whole earth."</div>
+      <div class="promise-ref" id="p3-ref">Zechariah 14:9</div>
+      <div id="main-truth">Jesus will defeat His enemies and reign as King forever without rival.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── STATE ──
+  let health = 100;
+  let currentWave = 0;
+
+  const waves = [
+    {
+      title: "The Nations Gather",
+      subtitle: "Armies surround the city walls",
+      choices: ["Reinforce Walls", "Send Archers", "Call for Allies"],
+      results: [
+        "The walls hold briefly\u2026 but the enemy finds weak points.",
+        "Arrows fly, but there are too many soldiers.",
+        "No allies answer. You are alone."
+      ],
+      damage: 30
+    },
+    {
+      title: "Siege & Famine",
+      subtitle: "Supply lines are cut off",
+      choices: ["Ration Food", "Dig a Tunnel", "Negotiate"],
+      results: [
+        "Rations run low. The people grow weak.",
+        "The tunnel collapses. Supplies can\u2019t get through.",
+        "The enemy refuses. They want total surrender."
+      ],
+      damage: 25
+    },
+    {
+      title: "Betrayal From Within",
+      subtitle: "Division spreads among the people",
+      choices: ["Unite the People", "Root Out Spies", "Strengthen the Guard"],
+      results: [
+        "Fear is stronger than your words. People lose hope.",
+        "Suspicion turns neighbor against neighbor.",
+        "The guards are exhausted. Morale crumbles."
+      ],
+      damage: 25
+    },
+    {
+      title: "The Final Assault",
+      subtitle: "Everything they have, all at once",
+      choices: ["Last Stand", "Defend the Gate", "Pray for a Miracle"],
+      results: [
+        "You fight bravely\u2026 but it\u2019s not enough.",
+        "The gate splinters. They pour through.",
+        "Silence. No answer comes \u2014 yet."
+      ],
+      damage: 20
+    }
+  ];
+
+  // ── INIT ──
+  function generateStars() {
+    const container = document.getElementById('stars');
+    for (let i = 0; i < 60; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 50 + '%';
+      const size = Math.random() * 2.5 + 1;
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
+      star.style.animationDelay = Math.random() * 3 + 's';
+      container.appendChild(star);
+    }
+  }
+
+  function generateMerlons() {
+    const wall = document.getElementById('wall');
+    for (let i = 0; i < 18; i++) {
+      const m = document.createElement('div');
+      m.className = 'merlon';
+      m.style.left = (i * 24 + 3) + 'px';
+      wall.appendChild(m);
+    }
+  }
+
+  generateStars();
+  generateMerlons();
+
+  // ── EVENT LISTENERS ──
+  document.getElementById('start-btn').addEventListener('click', startGame);
+  document.getElementById('promise-btn').addEventListener('click', startPhase2);
+
+  // ── GAME FLOW ──
+  function showPanel(id) {
+    document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+    if (id) document.getElementById(id).classList.add('active');
+  }
+
+  function startGame() {
+    showPanel(null);
+    document.getElementById('health-bar-container').style.display = 'block';
+    setTimeout(function() { showWave(0); }, 500);
+  }
+
+  function showWave(index) {
+    currentWave = index;
+    var wave = waves[index];
+    document.getElementById('wave-title').textContent = wave.title;
+    document.getElementById('wave-subtitle').textContent = wave.subtitle;
+
+    var choicesDiv = document.getElementById('choices');
+    // Clear existing children safely
+    while (choicesDiv.firstChild) {
+      choicesDiv.removeChild(choicesDiv.firstChild);
+    }
+
+    wave.choices.forEach(function(choice, i) {
+      var btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = choice;
+      btn.addEventListener('click', function() { selectDefense(i); });
+      choicesDiv.appendChild(btn);
+    });
+
+    showPanel('attack-panel');
+  }
+
+  function selectDefense(choiceIndex) {
+    var wave = waves[currentWave];
+    var buttons = document.querySelectorAll('.choice-btn');
+
+    // Disable buttons
+    buttons.forEach(function(b) {
+      b.style.pointerEvents = 'none';
+      b.style.opacity = '0.4';
+    });
+    // Highlight chosen
+    buttons[choiceIndex].style.opacity = '1';
+    buttons[choiceIndex].style.borderColor = '#c0392b';
+
+    setTimeout(function() {
+      showPanel(null);
+      playAttack(wave, choiceIndex);
+    }, 800);
+  }
+
+  function playAttack(wave, choiceIndex) {
+    // Screen shake
+    var scene = document.getElementById('scene');
+    scene.classList.add('shaking');
+    setTimeout(function() { scene.classList.remove('shaking'); }, 600);
+
+    // Spawn attack effects
+    spawnArrows();
+    if (currentWave >= 2) spawnFires();
+
+    // Damage city visuals
+    setTimeout(function() {
+      health = Math.max(0, health - wave.damage);
+      updateHealth();
+      updateCityDamage();
+    }, 400);
+
+    // Show result
+    setTimeout(function() {
+      var rt = document.getElementById('result-text');
+      rt.textContent = wave.results[choiceIndex];
+      rt.classList.add('visible');
+    }, 1000);
+
+    // Next wave or fallen
+    setTimeout(function() {
+      document.getElementById('result-text').classList.remove('visible');
+
+      if (currentWave < waves.length - 1) {
+        setTimeout(function() { showWave(currentWave + 1); }, 600);
+      } else {
+        cityFalls();
+      }
+    }, 4000);
+  }
+
+  function updateHealth() {
+    var bar = document.getElementById('health-bar');
+    bar.style.width = health + '%';
+    if (health <= 30) bar.classList.add('low');
+  }
+
+  function updateCityDamage() {
+    var city = document.getElementById('city-container');
+    var buildings = document.querySelectorAll('.building');
+    var towers = document.querySelectorAll('.tower');
+    var wall = document.getElementById('wall');
+
+    if (health <= 70 && health > 40) {
+      city.classList.add('damaged');
+      buildings[0].classList.add('cracked');
+      buildings[6].classList.add('cracked');
+    }
+    if (health <= 40 && health > 0) {
+      wall.classList.add('cracked');
+      towers.forEach(function(t) { t.classList.add('cracked'); });
+      buildings[1].classList.add('cracked');
+      buildings[4].classList.add('cracked');
+    }
+  }
+
+  function spawnArrows() {
+    for (var i = 0; i < 8; i++) {
+      (function(idx) {
+        setTimeout(function() {
+          var arrow = document.createElement('div');
+          arrow.className = 'arrow';
+          var fromLeft = Math.random() > 0.5;
+          arrow.style.top = (20 + Math.random() * 40) + 'vh';
+
+          if (fromLeft) {
+            arrow.style.left = '-50px';
+            arrow.style.transform = 'rotate(-15deg)';
+          } else {
+            arrow.style.right = '-50px';
+            arrow.style.transform = 'rotate(195deg)';
+          }
+
+          document.getElementById('scene').appendChild(arrow);
+
+          arrow.animate([
+            { opacity: 1, transform: arrow.style.transform + ' translateX(0)' },
+            { opacity: 0, transform: arrow.style.transform + ' translateX(' + (fromLeft ? '50vw' : '-50vw') + ')' }
+          ], { duration: 600 + Math.random() * 400, easing: 'ease-in' });
+
+          setTimeout(function() { arrow.remove(); }, 1200);
+        }, idx * 100);
+      })(i);
+    }
+  }
+
+  function spawnFires() {
+    for (var i = 0; i < 4; i++) {
+      (function(idx) {
+        setTimeout(function() {
+          var fire = document.createElement('div');
+          fire.className = 'fire';
+          var hue = 15 + Math.random() * 25;
+          var hue2 = 30 + Math.random() * 20;
+          fire.style.background = 'radial-gradient(ellipse at bottom, hsl(' + hue + ', 100%, 50%) 0%, hsl(' + hue2 + ', 100%, 40%) 40%, transparent 70%)';
+          fire.style.left = (35 + Math.random() * 30) + 'vw';
+          fire.style.bottom = (20 + Math.random() * 15) + 'vh';
+          document.getElementById('scene').appendChild(fire);
+
+          setTimeout(function() {
+            fire.style.opacity = '0';
+            fire.style.transition = 'opacity 1s';
+            setTimeout(function() { fire.remove(); }, 1000);
+          }, 2500);
+
+          // Smoke
+          var smoke = document.createElement('div');
+          smoke.className = 'smoke';
+          smoke.style.left = fire.style.left;
+          smoke.style.bottom = fire.style.bottom;
+          document.getElementById('scene').appendChild(smoke);
+          setTimeout(function() { smoke.remove(); }, 3000);
+        }, idx * 300);
+      })(i);
+    }
+  }
+
+  function cityFalls() {
+    // All buildings fall
+    document.querySelectorAll('.building').forEach(function(b) {
+      b.classList.remove('cracked');
+      b.classList.add('fallen');
+    });
+    document.querySelectorAll('.tower').forEach(function(t) {
+      t.classList.remove('cracked');
+      t.classList.add('fallen');
+    });
+    document.getElementById('wall').classList.remove('cracked');
+    document.getElementById('wall').classList.add('fallen');
+    document.getElementById('city-container').classList.add('destroyed');
+
+    // Final shake
+    var scene = document.getElementById('scene');
+    scene.classList.add('shaking');
+    setTimeout(function() { scene.classList.remove('shaking'); }, 600);
+
+    // Health to 0
+    health = 0;
+    updateHealth();
+
+    // Dark overlay
+    setTimeout(function() {
+      document.getElementById('dark-overlay').classList.add('active');
+    }, 1500);
+
+    // Show fallen panel
+    setTimeout(function() {
+      showPanel('fallen-panel');
+    }, 3000);
+  }
+
+  // ── PHASE 2 ──
+  function startPhase2() {
+    showPanel('promise-panel');
+    // Hide health bar during promises, reveal at end
+    document.getElementById('health-bar-container').style.opacity = '0';
+    document.getElementById('health-bar-container').style.transition = 'opacity 1s ease';
+
+    // Promise 1: Immovable Rock - rebuild city
+    setTimeout(function() {
+      document.getElementById('p1-verse').classList.add('visible');
+      document.getElementById('p1-ref').classList.add('visible');
+
+      document.querySelectorAll('.building').forEach(function(b) {
+        b.classList.remove('fallen', 'cracked');
+        b.classList.add('restored');
+      });
+      document.querySelectorAll('.tower').forEach(function(t) {
+        t.classList.remove('fallen', 'cracked');
+        t.classList.add('restored');
+      });
+      var wall = document.getElementById('wall');
+      wall.classList.remove('fallen', 'cracked');
+      wall.classList.add('restored');
+      document.getElementById('city-container').classList.remove('destroyed', 'damaged');
+      document.getElementById('city-container').classList.add('restored');
+      document.getElementById('dark-overlay').style.transition = 'opacity 3s ease';
+      document.getElementById('dark-overlay').classList.remove('active');
+      document.getElementById('dark-overlay').classList.add('clearing');
+    }, 500);
+
+    // Promise 2: Fountain - water
+    setTimeout(function() {
+      document.getElementById('p2-verse').classList.add('visible');
+      document.getElementById('p2-ref').classList.add('visible');
+      document.getElementById('water').classList.add('flowing');
+    }, 6000);
+
+    // Promise 3: King - dawn
+    setTimeout(function() {
+      document.getElementById('p3-verse').classList.add('visible');
+      document.getElementById('p3-ref').classList.add('visible');
+      document.getElementById('sky').classList.add('dawn');
+      var bar = document.getElementById('health-bar');
+      bar.classList.remove('low');
+      bar.classList.add('gold');
+      health = 100;
+      bar.style.width = '100%';
+      document.getElementById('health-label').textContent = 'Jerusalem Restored';
+      document.getElementById('health-bar-container').style.opacity = '1';
+    }, 11500);
+
+    // Main truth
+    setTimeout(function() {
+      document.getElementById('main-truth').classList.add('visible');
+    }, 17000);
+  }
+</script>
+
+</body>
+</html>
