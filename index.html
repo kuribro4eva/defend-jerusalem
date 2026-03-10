@@ -727,6 +727,10 @@
   var wavesSurvived = 0;
 
   // damage: 0 = hold out (no health loss), >0 = health drops by that amount
+  // Good picks: [0] Deploy Shield Wall, [1] Reinforce Gate with Timber, [2] Launch Flaming Catapults,
+  //   [3] Ration Food and Water, [4] Drop Boulders from Above, [5] Set Fire to Siege Equipment,
+  //   [6] Fortify the Inner Wall, [7] Deploy Archers to High Ground, [8] Flood the Tunnels,
+  //   [9] all 100 (auto-kill)
   var waves = [
     {
       title: "Archers on the Horizon",
@@ -743,12 +747,12 @@
     {
       title: "Battering Ram at the Gate",
       subtitle: "A massive ram pounds against the main gate",
-      choices: ["Drop Boulders from Above", "Reinforce the Gate with Timber", "Send Cavalry Out to Flank"],
-      damage: [5, 0, 15],
+      choices: ["Send Cavalry Out to Flank", "Reinforce the Gate with Timber", "Shoot Arrows at the Ram Crew"],
+      damage: [10, 0, 5],
       results: [
-        "Boulders slow them down, but the ram is heavily armored.",
+        "The cavalry charges out but is surrounded and cut off.",
         "The timber braces hold! The gate stands firm.",
-        "The cavalry charges out but is surrounded and cut off."
+        "A few fall, but more soldiers take their place."
       ],
       defenseAnim: "defense-supplies"
     },
@@ -756,17 +760,89 @@
       title: "Siege Towers Approach",
       subtitle: "Towering siege engines roll toward the walls",
       choices: ["Launch Flaming Catapults", "Dig a Trench to Block Them", "Rally Troops to the Walls"],
-      damage: [5, 10, 15],
+      damage: [0, 10, 5],
       results: [
-        "One tower burns, but two more keep coming.",
+        "Direct hit! The siege towers burn to the ground.",
         "The trench slows them, but they fill it with rubble and press on.",
-        "Your troops fight bravely, but they are overwhelmed."
+        "Your troops hold the wall, but take heavy casualties."
       ],
       defenseAnim: "defense-unity"
     },
     {
-      title: "The Full Assault",
-      subtitle: "Every enemy force attacks at once from all sides",
+      title: "Supplies Running Low",
+      subtitle: "The siege drags on and food is scarce",
+      choices: ["Ration Food and Water", "Send Scouts for Supplies", "Slaughter the Horses for Meat"],
+      damage: [0, 10, 10],
+      results: [
+        "Careful rationing keeps the garrison fed. Morale holds.",
+        "The scouts are captured. No supplies get through.",
+        "The meat buys time, but now you have no cavalry."
+      ],
+      defenseAnim: "defense-supplies"
+    },
+    {
+      title: "Sappers Under the Wall",
+      subtitle: "The enemy digs tunnels beneath your foundations",
+      choices: ["Charge Out to Stop Them", "Drop Boulders from Above", "Dig Counter-Tunnels"],
+      damage: [15, 0, 10],
+      results: [
+        "Your soldiers are ambushed outside the walls.",
+        "The boulders collapse the tunnel entrance! Threat neutralized.",
+        "The tunnels meet underground\u2026 fierce fighting, heavy losses."
+      ],
+      defenseAnim: "defense-walls"
+    },
+    {
+      title: "Fire Assault",
+      subtitle: "Flaming projectiles rain down on the city",
+      choices: ["Set Fire to Their Siege Equipment", "Form Bucket Brigades", "Evacuate to the Inner Keep"],
+      damage: [0, 10, 15],
+      results: [
+        "A daring raid destroys their catapults! The fires stop.",
+        "Buckets slow the damage, but buildings still burn.",
+        "The outer city burns. You lose ground and supplies."
+      ],
+      defenseAnim: "defense-combat"
+    },
+    {
+      title: "Cavalry Charge",
+      subtitle: "Mounted warriors thunder toward the weakened walls",
+      choices: ["Fortify the Inner Wall", "Set Spike Traps", "Open the Gates and Charge"],
+      damage: [0, 15, 20],
+      results: [
+        "The inner wall holds firm. The cavalry can\u2019t break through.",
+        "Some horses fall, but the riders dismount and keep fighting.",
+        "A brave charge\u2026 but you are outnumbered five to one."
+      ],
+      defenseAnim: "defense-walls"
+    },
+    {
+      title: "Night Raid",
+      subtitle: "Under cover of darkness, elite soldiers scale the walls",
+      choices: ["Deploy Archers to High Ground", "Light Signal Fires", "Send Patrols Along the Wall"],
+      damage: [0, 15, 15],
+      results: [
+        "Your archers spot them in the moonlight and cut them down.",
+        "The fires reveal some climbers, but others slip through unseen.",
+        "The patrols are spread too thin. Several breaches open."
+      ],
+      defenseAnim: "defense-unity"
+    },
+    {
+      title: "Tunnels Beneath the City",
+      subtitle: "The ground shakes \u2014 they\u2019re tunneling under the city itself",
+      choices: ["Abandon the Outer District", "Flood the Tunnels", "Collapse Buildings to Block Them"],
+      damage: [20, 0, 15],
+      results: [
+        "You lose a third of the city. The enemy pours in.",
+        "Water rushes into the tunnels! The diggers retreat.",
+        "Buildings fall, but the rubble only slows them briefly."
+      ],
+      defenseAnim: "defense-combat"
+    },
+    {
+      title: "The Final Assault",
+      subtitle: "Every remaining force attacks at once from all sides",
       choices: ["Man Every Wall", "Concentrate at the Gate", "Launch a Final Sortie"],
       damage: [100, 100, 100],
       results: [
@@ -972,7 +1048,7 @@
   // ── GAME FLOW ──
   function startGame() {
     showPanel(null);
-    document.getElementById('wave-counter').textContent = 'Wave 1';
+    document.getElementById('wave-counter').textContent = 'Wave 1 / 10';
     setTimeout(function() { showWave(0); }, 400);
   }
 
@@ -982,9 +1058,9 @@
     document.getElementById('wave-title').textContent = wave.title;
     document.getElementById('wave-subtitle').textContent = wave.subtitle;
 
-    // Apply wave color theme
+    // Apply wave color theme (cycle through 4 themes)
     var attackPanel = document.getElementById('attack-panel');
-    attackPanel.className = 'panel wave-theme-' + index;
+    attackPanel.className = 'panel wave-theme-' + (index % 4);
 
     var choicesDiv = document.getElementById('choices');
     while (choicesDiv.firstChild) { choicesDiv.removeChild(choicesDiv.firstChild); }
@@ -1077,7 +1153,7 @@
       } else {
         // Survived — next wave
         wavesSurvived++;
-        document.getElementById('wave-counter').textContent = 'Wave ' + (currentWave + 2);
+        document.getElementById('wave-counter').textContent = 'Wave ' + (currentWave + 2) + ' / 10';
         setTimeout(function() { showWave(currentWave + 1); }, 1000);
       }
     }, 3500);
