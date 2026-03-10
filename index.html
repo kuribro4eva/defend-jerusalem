@@ -91,7 +91,7 @@
   /* ── CITY ── */
   #city-container {
     position: absolute;
-    top: 55%;
+    top: 58%;
     left: 50%;
     transform: translate(-50%, -100%);
     z-index: 10;
@@ -126,8 +126,8 @@
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 500px;
-    height: 50px;
+    width: 700px;
+    height: 65px;
     background: #4a3a25;
     border-top: 3px solid #5a4a35;
     z-index: 8;
@@ -135,9 +135,9 @@
   }
   #wall .merlon {
     position: absolute;
-    top: -14px;
-    width: 20px;
-    height: 14px;
+    top: -18px;
+    width: 24px;
+    height: 18px;
     background: #4a3a25;
     border: 1px solid #5a4a35;
   }
@@ -159,10 +159,10 @@
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 40px;
-    height: 36px;
+    width: 52px;
+    height: 46px;
     background: #1a1410;
-    border-radius: 20px 20px 0 0;
+    border-radius: 26px 26px 0 0;
     border: 2px solid #5a4a35;
     border-bottom: none;
     z-index: 9;
@@ -172,7 +172,7 @@
   .tower {
     position: absolute;
     bottom: 0;
-    width: 34px;
+    width: 46px;
     background: #4a3a25;
     border: 1px solid #5a4a35;
     z-index: 9;
@@ -180,10 +180,10 @@
   }
   .tower-cap {
     position: absolute;
-    top: -10px;
-    left: -4px;
-    width: 42px;
-    height: 12px;
+    top: -12px;
+    left: -5px;
+    width: 56px;
+    height: 14px;
     background: #5a4a35;
     border-radius: 2px;
   }
@@ -235,32 +235,72 @@
   #health-bar.low { background: linear-gradient(90deg, #c0392b, #e74c3c); }
   #health-bar.gold { background: linear-gradient(90deg, #c8a84e, #e8c85e, #c8a84e); }
 
+  /* ── WAVE COLOR THEMES ── */
+  .wave-theme-0 { --wave-color: #4a90d9; --wave-glow: rgba(74, 144, 217, 0.4); }
+  .wave-theme-1 { --wave-color: #2ecc71; --wave-glow: rgba(46, 204, 113, 0.4); }
+  .wave-theme-2 { --wave-color: #e67e22; --wave-glow: rgba(230, 126, 34, 0.4); }
+  .wave-theme-3 { --wave-color: #9b59b6; --wave-glow: rgba(155, 89, 182, 0.4); }
+
+  #attack-panel.wave-theme-0 #wave-title { color: #4a90d9; text-shadow: 0 0 25px rgba(74, 144, 217, 0.4); }
+  #attack-panel.wave-theme-1 #wave-title { color: #2ecc71; text-shadow: 0 0 25px rgba(46, 204, 113, 0.4); }
+  #attack-panel.wave-theme-2 #wave-title { color: #e67e22; text-shadow: 0 0 25px rgba(230, 126, 34, 0.4); }
+  #attack-panel.wave-theme-3 #wave-title { color: #9b59b6; text-shadow: 0 0 25px rgba(155, 89, 182, 0.4); }
+
+  #attack-panel.wave-theme-0 .choice-btn:hover { border-color: #4a90d9; background: rgba(30, 60, 120, 0.6); }
+  #attack-panel.wave-theme-1 .choice-btn:hover { border-color: #2ecc71; background: rgba(20, 80, 40, 0.6); }
+  #attack-panel.wave-theme-2 .choice-btn:hover { border-color: #e67e22; background: rgba(100, 50, 10, 0.6); }
+  #attack-panel.wave-theme-3 .choice-btn:hover { border-color: #9b59b6; background: rgba(70, 30, 90, 0.6); }
+
   /* ── DEFENSE ANIMATIONS ── */
   @keyframes defense-walls {
-    0%, 100% { box-shadow: none; }
-    50% { box-shadow: 0 0 40px rgba(100, 150, 255, 0.6), inset 0 0 20px rgba(100, 150, 255, 0.2); }
+    0% { box-shadow: none; filter: brightness(1); }
+    25% { box-shadow: 0 0 30px rgba(74, 144, 217, 0.5); }
+    50% { box-shadow: 0 0 60px rgba(74, 144, 217, 0.8), inset 0 0 25px rgba(74, 144, 217, 0.3); filter: brightness(1.3); }
+    75% { box-shadow: 0 0 40px rgba(74, 144, 217, 0.4); }
+    100% { box-shadow: none; filter: brightness(1); }
   }
-  #city-container.defense-walls #wall { animation: defense-walls 1s ease-in-out; }
-  #city-container.defense-walls .tower { animation: defense-walls 1s ease-in-out; }
+  #city-container.defense-walls #wall { animation: defense-walls 1.2s ease-in-out; }
+  #city-container.defense-walls .tower { animation: defense-walls 1.2s ease-in-out 0.1s; }
 
   @keyframes defense-supplies {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.5) sepia(0.3); }
+    0% { filter: brightness(1); box-shadow: none; }
+    30% { filter: brightness(1.2); box-shadow: 0 0 15px rgba(46, 204, 113, 0.3); }
+    60% { filter: brightness(1.6) sepia(0.2); box-shadow: 0 0 30px rgba(46, 204, 113, 0.6); }
+    100% { filter: brightness(1); box-shadow: none; }
   }
-  #city-container.defense-supplies .building { animation: defense-supplies 1s ease-in-out; }
+  @keyframes defense-supplies-city {
+    0%, 100% { box-shadow: none; }
+    50% { box-shadow: 0 0 50px rgba(46, 204, 113, 0.4), 0 0 80px rgba(46, 204, 113, 0.15); }
+  }
+  #city-container.defense-supplies .building { animation: defense-supplies 1.2s ease-in-out; }
+  #city-container.defense-supplies { animation: defense-supplies-city 1.2s ease-in-out; }
 
   @keyframes defense-unity {
-    0%, 100% { box-shadow: none; }
-    50% { box-shadow: 0 0 50px rgba(255, 180, 80, 0.5), 0 0 80px rgba(255, 150, 50, 0.2); }
+    0% { box-shadow: none; }
+    20% { box-shadow: 0 0 30px rgba(230, 126, 34, 0.3); }
+    50% { box-shadow: 0 0 70px rgba(230, 126, 34, 0.6), 0 0 120px rgba(255, 160, 50, 0.25); }
+    80% { box-shadow: 0 0 40px rgba(230, 126, 34, 0.3); }
+    100% { box-shadow: none; }
   }
-  #city-container.defense-unity { animation: defense-unity 1s ease-in-out; }
+  @keyframes defense-unity-pulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.4) saturate(1.3); }
+  }
+  #city-container.defense-unity { animation: defense-unity 1.2s ease-in-out; }
+  #city-container.defense-unity .building { animation: defense-unity-pulse 0.6s ease-in-out 2; }
 
   @keyframes defense-combat {
-    0%, 100% { box-shadow: none; }
-    30% { box-shadow: 0 0 30px rgba(255, 60, 30, 0.7); }
-    60% { box-shadow: 0 0 45px rgba(255, 100, 30, 0.9); }
+    0% { box-shadow: none; }
+    20% { box-shadow: 0 0 25px rgba(155, 89, 182, 0.4); }
+    40% { box-shadow: 0 0 50px rgba(155, 89, 182, 0.7), 0 0 80px rgba(120, 60, 180, 0.3); }
+    60% { box-shadow: 0 0 65px rgba(155, 89, 182, 0.9), 0 0 100px rgba(120, 60, 180, 0.4); }
+    100% { box-shadow: none; }
   }
-  #city-container.defense-combat { animation: defense-combat 1s ease-in-out; }
+  @keyframes defense-combat-sparkle {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+  }
+  #city-container.defense-combat { animation: defense-combat 1.2s ease-in-out; }
 
   /* ── AURA (Phase 2) ── */
   @keyframes aura-pulse {
@@ -599,15 +639,16 @@
     <!-- City -->
     <div id="city-container">
       <div id="wall"><div id="gate"></div></div>
-      <div class="tower" id="tower-left" style="left: -24px; height: 90px;"><div class="tower-cap"></div></div>
-      <div class="tower" id="tower-right" style="right: -24px; height: 90px;"><div class="tower-cap"></div></div>
-      <div class="building" style="left: 25px; width: 55px; height: 80px;"></div>
-      <div class="building" style="left: 90px; width: 45px; height: 115px;"></div>
-      <div class="building" style="left: 145px; width: 60px; height: 95px;"></div>
-      <div class="building" style="left: 220px; width: 50px; height: 130px;"></div>
-      <div class="building" style="left: 285px; width: 55px; height: 85px;"></div>
-      <div class="building" style="left: 350px; width: 45px; height: 105px;"></div>
-      <div class="building" style="left: 405px; width: 40px; height: 75px;"></div>
+      <div class="tower" id="tower-left" style="left: -34px; height: 120px;"><div class="tower-cap"></div></div>
+      <div class="tower" id="tower-right" style="right: -34px; height: 120px;"><div class="tower-cap"></div></div>
+      <div class="building" style="left: 30px; width: 70px; height: 110px;"></div>
+      <div class="building" style="left: 115px; width: 60px; height: 155px;"></div>
+      <div class="building" style="left: 195px; width: 75px; height: 125px;"></div>
+      <div class="building" style="left: 290px; width: 65px; height: 175px;"></div>
+      <div class="building" style="left: 375px; width: 70px; height: 115px;"></div>
+      <div class="building" style="left: 460px; width: 60px; height: 145px;"></div>
+      <div class="building" style="left: 540px; width: 55px; height: 100px;"></div>
+      <div class="building" style="left: 610px; width: 50px; height: 130px;"></div>
     </div>
 
     <div id="water"></div>
@@ -700,13 +741,13 @@
       defenseAnim: "defense-unity"
     },
     {
-      title: "The Final Assault",
-      subtitle: "Everything they have, all at once",
-      choices: ["Last Stand", "Defend the Gate", "Set a Trap"],
+      title: "Plague Strikes the City",
+      subtitle: "A deadly sickness sweeps through your people",
+      choices: ["Quarantine the Sick", "Burn Infected Supplies", "Pray to the Idols"],
       results: [
-        "You fight bravely\u2026 but it\u2019s not enough.",
-        "The gate splinters. They pour through.",
-        "The trap springs but barely slows them down."
+        "The sick are isolated\u2026 but the plague spreads anyway.",
+        "The supplies burn, but the people starve without them.",
+        "The idols are silent. No one answers."
       ],
       defenseAnim: "defense-combat"
     }
@@ -730,10 +771,10 @@
 
   function generateMerlons() {
     var wall = document.getElementById('wall');
-    for (var i = 0; i < 20; i++) {
+    for (var i = 0; i < 26; i++) {
       var m = document.createElement('div');
       m.className = 'merlon';
-      m.style.left = (i * 26 + 3) + 'px';
+      m.style.left = (i * 27 + 3) + 'px';
       wall.appendChild(m);
     }
   }
@@ -877,6 +918,10 @@
     var wave = waves[index];
     document.getElementById('wave-title').textContent = wave.title;
     document.getElementById('wave-subtitle').textContent = wave.subtitle;
+
+    // Apply wave color theme
+    var attackPanel = document.getElementById('attack-panel');
+    attackPanel.className = 'panel wave-theme-' + index;
 
     var choicesDiv = document.getElementById('choices');
     while (choicesDiv.firstChild) { choicesDiv.removeChild(choicesDiv.firstChild); }
