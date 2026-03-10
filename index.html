@@ -110,6 +110,11 @@
     border: 1px solid #4a4030;
     transition: all 0.6s ease;
   }
+  .building.damaged {
+    transform: scaleY(0.7) skewX(-3deg);
+    opacity: 0.6;
+    filter: brightness(0.5);
+  }
   .building.fallen {
     transform: scaleY(0.12) scaleX(1.4);
     opacity: 0.4;
@@ -235,6 +240,14 @@
   }
   #health-bar.low { background: linear-gradient(90deg, #c0392b, #e74c3c); }
   #health-bar.gold { background: linear-gradient(90deg, #c8a84e, #e8c85e, #c8a84e); }
+  #wave-counter {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(11px, 1.2vw, 18px);
+    letter-spacing: 2px;
+    color: #8a7a60;
+    margin-top: 6px;
+    min-height: 1.2em;
+  }
 
   /* ── WAVE COLOR THEMES ── */
   .wave-theme-0 { --wave-color: #4a90d9; --wave-glow: rgba(74, 144, 217, 0.4); }
@@ -663,6 +676,7 @@
     <div id="health-bar-container">
       <div id="health-label">Castle Defense</div>
       <div id="health-bar-bg"><div id="health-bar"></div></div>
+      <div id="wave-counter"></div>
     </div>
 
     <!-- UI Overlay -->
@@ -710,49 +724,55 @@
   // ── STATE ──
   var health = 100;
   var currentWave = 0;
+  var wavesSurvived = 0;
 
+  // damage: 0 = hold out (no health loss), >0 = health drops by that amount
   var waves = [
     {
-      title: "Armies Attack",
-      subtitle: "Enemy forces charge the walls",
-      choices: ["Reinforce Walls", "Send Archers", "Call for Allies"],
+      title: "Archers on the Horizon",
+      subtitle: "A line of enemy archers advances toward the walls",
+      choices: ["Deploy Shield Wall", "Fire Back with Archers", "Pour Boiling Oil"],
+      damage: [0, 10, 5],
       results: [
-        "The walls hold briefly\u2026 but the enemy breaks through.",
-        "Arrows fly, but there are too many soldiers.",
-        "No allies answer. You are alone."
+        "The shields deflect the arrows! The walls hold.",
+        "Your archers trade volleys\u2026 but you lose more than they do.",
+        "The oil drives some back, but they regroup quickly."
       ],
       defenseAnim: "defense-walls"
     },
     {
-      title: "Siege & Famine",
-      subtitle: "Supply lines are cut off",
-      choices: ["Ration Supplies", "Dig a Tunnel", "Negotiate Peace"],
+      title: "Battering Ram at the Gate",
+      subtitle: "A massive ram pounds against the main gate",
+      choices: ["Drop Boulders from Above", "Reinforce the Gate with Timber", "Send Cavalry Out to Flank"],
+      damage: [5, 0, 15],
       results: [
-        "Rations run low. The people grow weak.",
-        "The tunnel collapses. No supplies get through.",
-        "The enemy refuses. They want total surrender."
+        "Boulders slow them down, but the ram is heavily armored.",
+        "The timber braces hold! The gate stands firm.",
+        "The cavalry charges out but is surrounded and cut off."
       ],
       defenseAnim: "defense-supplies"
     },
     {
-      title: "Betrayal From Within",
-      subtitle: "Division spreads among the people",
-      choices: ["Unite the People", "Root Out Spies", "Strengthen the Guard"],
+      title: "Siege Towers Approach",
+      subtitle: "Towering siege engines roll toward the walls",
+      choices: ["Launch Flaming Catapults", "Dig a Trench to Block Them", "Rally Troops to the Walls"],
+      damage: [5, 10, 15],
       results: [
-        "Fear is stronger than your words. People lose hope.",
-        "Suspicion turns neighbor against neighbor.",
-        "The guards are exhausted. Morale crumbles."
+        "One tower burns, but two more keep coming.",
+        "The trench slows them, but they fill it with rubble and press on.",
+        "Your troops fight bravely, but they are overwhelmed."
       ],
       defenseAnim: "defense-unity"
     },
     {
-      title: "Plague Strikes the City",
-      subtitle: "A deadly sickness sweeps through your people",
-      choices: ["Quarantine the Sick", "Burn Infected Supplies", "Pray to the Idols"],
+      title: "The Full Assault",
+      subtitle: "Every enemy force attacks at once from all sides",
+      choices: ["Man Every Wall", "Concentrate at the Gate", "Launch a Final Sortie"],
+      damage: [100, 100, 100],
       results: [
-        "The sick are isolated\u2026 but the plague spreads anyway.",
-        "The supplies burn, but the people starve without them.",
-        "The idols are silent. No one answers."
+        "You spread too thin. They break through everywhere.",
+        "The gate holds, but they pour over the undefended walls.",
+        "A valiant charge\u2026 but there are too many. The city falls."
       ],
       defenseAnim: "defense-combat"
     }
@@ -828,7 +848,7 @@
   }
 
   function resetCity() {
-    document.querySelectorAll('.building').forEach(function(b) { b.classList.remove('fallen', 'restored'); });
+    document.querySelectorAll('.building').forEach(function(b) { b.classList.remove('fallen', 'restored', 'damaged'); });
     document.querySelectorAll('.tower').forEach(function(t) { t.classList.remove('fallen', 'restored'); });
     var wall = document.getElementById('wall');
     wall.classList.remove('fallen', 'restored');
@@ -837,6 +857,28 @@
     var bar = document.getElementById('health-bar');
     bar.style.width = '100%';
     bar.classList.remove('low');
+  }
+
+  // Progressive damage — some buildings crumble based on health
+  function updateCityDamage() {
+    var buildings = document.querySelectorAll('.building');
+    var total = buildings.length;
+    // How many buildings should be damaged/fallen based on health
+    var damagedCount = Math.floor((1 - health / 100) * total);
+    // Damage from the outside buildings inward
+    var damageOrder = [0, total - 1, 1, total - 2, 2, total - 3, 3, total - 4];
+    for (var i = 0; i < total; i++) {
+      var idx = i < damageOrder.length ? damageOrder[i] : i;
+      if (idx >= 0 && idx < total) {
+        if (i < damagedCount) {
+          buildings[idx].classList.add('damaged');
+        }
+      }
+    }
+    // Full destruction at 0
+    if (health <= 0) {
+      destroyCity();
+    }
   }
 
   function restoreCity() {
@@ -930,6 +972,7 @@
   // ── GAME FLOW ──
   function startGame() {
     showPanel(null);
+    document.getElementById('wave-counter').textContent = 'Wave 1';
     setTimeout(function() { showWave(0); }, 400);
   }
 
@@ -959,12 +1002,14 @@
 
   function selectDefense(choiceIndex) {
     var wave = waves[currentWave];
+    var damage = wave.damage[choiceIndex];
     var buttons = document.querySelectorAll('.choice-btn');
+    var isGoodChoice = damage === 0;
 
     // Disable + highlight
     buttons.forEach(function(b) { b.style.pointerEvents = 'none'; b.style.opacity = '0.4'; });
     buttons[choiceIndex].style.opacity = '1';
-    buttons[choiceIndex].style.borderColor = '#c0392b';
+    buttons[choiceIndex].style.borderColor = isGoodChoice ? '#2ecc71' : '#c0392b';
 
     // Defense animation
     setTimeout(function() {
@@ -976,58 +1021,73 @@
       setTimeout(function() {
         city.classList.remove(wave.defenseAnim);
         playAttack(wave, choiceIndex);
-      }, 1000);
+      }, 1200);
     }, 600);
   }
 
   function playAttack(wave, choiceIndex) {
-    // Shake
+    var damage = wave.damage[choiceIndex];
+    var isGoodChoice = damage === 0;
+
+    // Shake (stronger for bad choices)
     var scene = document.getElementById('scene');
-    scene.classList.add('shaking');
-    setTimeout(function() { scene.classList.remove('shaking'); }, 600);
+    if (!isGoodChoice) {
+      scene.classList.add('shaking');
+      setTimeout(function() { scene.classList.remove('shaking'); }, 600);
+    }
 
-    // Arrows + fire
-    spawnArrows(false);
-    if (currentWave >= 2) spawnFires();
+    // Arrows (always), fire (later waves or bad choices)
+    spawnArrows(isGoodChoice);
+    if (currentWave >= 2 || damage >= 15) spawnFires();
 
-    // Destroy
+    // Apply damage
     setTimeout(function() {
-      health = 0;
+      health = Math.max(0, health - damage);
       updateHealth();
-      destroyCity();
+      updateCityDamage();
     }, 500);
 
     // Result text
     setTimeout(function() {
       var rt = document.getElementById('result-text');
       rt.textContent = wave.results[choiceIndex];
+      if (isGoodChoice) {
+        rt.style.color = '#2ecc71';
+        rt.style.textShadow = '0 0 20px rgba(46, 204, 113, 0.4)';
+      } else {
+        rt.style.color = '#c0392b';
+        rt.style.textShadow = '0 0 20px rgba(192, 57, 43, 0.4)';
+      }
       rt.classList.add('visible');
     }, 1200);
 
-    // Next
+    // Update wave counter + next
     setTimeout(function() {
       document.getElementById('result-text').classList.remove('visible');
 
-      if (currentWave < waves.length - 1) {
-        // Reset and next wave
-        setTimeout(function() {
-          resetCity();
-          setTimeout(function() { showWave(currentWave + 1); }, 800);
-        }, 800);
-      } else {
-        // Final wave: bridge
+      if (health <= 0) {
+        // City fallen — go to bridge
+        showPanel(null);
         setTimeout(function() {
           document.getElementById('dark-overlay').classList.add('active');
+          var counter = document.getElementById('wave-counter');
+          counter.textContent = 'Waves Survived: ' + wavesSurvived;
           setTimeout(function() { showPanel('bridge-panel'); }, 1500);
         }, 500);
+      } else {
+        // Survived — next wave
+        wavesSurvived++;
+        document.getElementById('wave-counter').textContent = 'Wave ' + (currentWave + 2);
+        setTimeout(function() { showWave(currentWave + 1); }, 1000);
       }
-    }, 3800);
+    }, 3500);
   }
 
   // ── PHASE 2 ──
   function startPhase2() {
     // Change label
     document.getElementById('health-label').textContent = 'Jerusalem';
+    document.getElementById('wave-counter').textContent = '';
 
     // Reset city + health
     resetCity();
